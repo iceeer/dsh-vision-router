@@ -23,8 +23,8 @@ core.Config.set('progressiveTools', z.boolean().default(false))
 // one visual task (including fallbacks) shares 120s. The whole-turn visual
 // budget is an optional user safety cap rather than an Agent lifetime policy:
 // 0 means unlimited, which is the default for long-running autonomous turns.
-core.Config.set('visionTaskTimeoutMs', z.number().step(1000).min(1000).max(180000).default(120000))
-core.Config.set('visionTurnBudgetMs', z.number().step(1000).min(0).max(600000).default(0))
+core.Config.set('visionTaskTimeoutMs', z.number().step(1000).min(1000).max(600000).default(600000))
+core.Config.set('visionTurnBudgetMs', z.number().step(1000).min(0).max(600000).default(600000))
 
 // Both visible entry points — Settings > Vision Router and the legacy
 // Settings > Plugins compatibility card — edit the same Host-owned namespace.

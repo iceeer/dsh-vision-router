@@ -347,16 +347,16 @@ export const Config = z.object({
   cache: z.boolean().default(true),
   cacheTtlSeconds: z.number().step(1).min(0).default(3600),
   cacheMaxEntries: z.number().step(1).min(1).default(200),
-  timeoutMs: z.number().step(1).min(1000).max(600000).default(120000),
+  timeoutMs: z.number().step(1).min(1000).max(600000).default(600000),
   // One vision task (vision_describe / vision_ground / … including every
   // provider, fallback and retry inside it) shares this single wall-clock
   // budget. Per-provider requests are capped by min(timeoutMs, remaining
   // budget), so a chain of slow backends can never multiply the wait.
-  visionTaskTimeoutMs: z.number().step(1).min(1000).max(180000).default(45000),
+  visionTaskTimeoutMs: z.number().step(1).min(1000).max(600000).default(600000),
   // Total budget for one OCR task. Local tesseract gets at most 12s of it
   // (its own cap) and the vision-model fallback only the rest — never two
   // full timeouts added together.
-  ocrTimeoutMs: z.number().step(1).min(1000).max(120000).default(30000),
+  ocrTimeoutMs: z.number().step(1).min(1000).max(600000).default(600000),
   proxy: z.string().default(''),
   proxyHosts: z.array(z.string()).default([...DEFAULT_PROXY_HOSTS]),
   // Remote browsers are intentionally unable to use DSH's broad settings.*
@@ -2613,7 +2613,7 @@ export async function buildInstantLocalMap(ctx, messages, provider, options = {}
   // 时间除以剩余 provider 数的公平份额；这样第一层挂起仍会给下一层留下
   // 一次真实请求。控制器的 timer 在 finally 清理，不在长驻进程里堆积。
   const budgetMs =
-    Number.isFinite(options.timeoutMs) && options.timeoutMs > 0 ? options.timeoutMs : 120000
+    Number.isFinite(options.timeoutMs) && options.timeoutMs > 0 ? options.timeoutMs : 600000
   const deadlineAt = Date.now() + budgetMs
   let failed = 0
   try {
@@ -3122,13 +3122,13 @@ export function apply(ctx, config = {}, runtime = {}) {
   // #208 large-tool follow-up complete: crop is bounded and presentation is compressed passthrough.
   const timeoutMs = () => {
     const value = current().timeoutMs
-    return Number.isFinite(value) && value > 0 ? value : 120000
+    return Number.isFinite(value) && value > 0 ? value : 600000
   }
   // One vision task shares this single wall-clock budget (see the Config
   // schema docs). Every provider/fallback/retry draws from the same deadline.
   const visionTaskTimeoutMs = () => {
     const value = current().visionTaskTimeoutMs
-    return Number.isFinite(value) && value > 0 ? value : 45000
+    return Number.isFinite(value) && value > 0 ? value : 600000
   }
   // One OCR task shares this budget: tesseract gets a capped slice, the
   // vision fallback only the remainder.

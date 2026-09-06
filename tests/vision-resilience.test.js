@@ -102,7 +102,7 @@ test('circuit breaker: AUTH trips until the credential fingerprint changes', () 
 
 test('circuit breaker: AUTH trip expires after the TTL for unobservable credentials', () => {
   let now = 0
-  const breaker = createVisionCircuitBreaker({ now: () => now, authTripTtlMs: 600000 })
+  const breaker = createVisionCircuitBreaker({ now: () => now, authTripTtlMs: 6000000 })
   breaker.record('p/m', 'unresolved', { kind: 'AUTH' }, 's1:1')
   assert.equal(breaker.inspect('p/m', 'unresolved', 's1:1').blocked, true)
   now = 600001
